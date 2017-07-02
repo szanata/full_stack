@@ -1,0 +1,44 @@
+{
+  "name": "full_stack",
+  "version": "0.0.1",
+  "description": "Dont lose logs on Node's event loop callbacks",
+  "main": "full_stack.js",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "3.5.0",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.10.3",
+    "express": "^4.13.4",
+    "mocha": "3.0.1",
+    "mock-require": "1.3.0",
+    "sinon": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:madeinstefano/full_stack.git"
+  },
+  "keywords": [
+    "logs",
+    "request",
+    "node"
+  ],
+  "engines": {
+    "node": "8.1.2",
+    "npm": "3.10.6"
+  },
+  "scripts": {
+    "lint:lib": "eslint lib/ --fix",
+    "lint:root": "eslint full_stack.js --fix",
+    "lint": "npm run lint:lib && npm run lint:root",
+    "test": "./node_modules/.bin/mocha --reporter spec --recursive ./spec/unit --timeout 2000"
+  },
+  "contributors": [
+    {
+      "name": "Stéfano Zanata",
+      "email": "contato@szanata.com"
+    }
+  ]
+}
