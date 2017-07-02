@@ -68,8 +68,6 @@ function wrapCallback( fn, frameLocation ) {
   };
 }
 
-Error.prepareStackTrace = prepareStackTrace;
-
 module.exports = {
 
   /**
@@ -81,6 +79,12 @@ module.exports = {
    * @param {...Number} cbIds Within this method parameters, which of those are callback functions (just the id - zero padded)
    */
   prepare( obj, prop, ...cbs ) {
+
+    // load the prepareStackTrace for the first time (if needed)
+    if (!Error.prepareStackTrace) {
+      Error.prepareStackTrace = prepareStackTrace;
+    }
+
     if ( typeof obj[prop] !== 'function' ) {
       console.error( `FullStack Exception: ${obj} don't have member function ${prop}.` );
       return;
