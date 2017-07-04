@@ -3,9 +3,10 @@
  * Print a complete stack trace even atfer calback is loop in the vent loop
  */
 
-Error.stackTraceLimit = 50;
-
 const utils = require( './lib/utils' );
+const ObjectHandler = require( './lib/object_handler' );
+
+Error.stackTraceLimit = 50;
 
 /**
  * @const {String} filename
@@ -25,13 +26,16 @@ let currentTraceError;
  * @param {Callsite[]} structuredStackTrace Array of Callsites, which are previous stests from a stack trace, in a native object format
  */
 function prepareStackTrace( error, structuredStackTrace ) {
+
   // If error already have a cached trace inside, just return that
+  // happens on true errors most
   if ( error.__cachedTrace ) { return error.__cachedTrace; }
 
   const stackTrace = utils.createStackTrace( error, structuredStackTrace );
   error.__cachedTrace = utils.removeInternalFrames( filename, stackTrace );
 
   if ( !error.__previous ) {
+
     let previousTraceError = currentTraceError;
     while ( previousTraceError ) {
       const previousTrace = utils.removeInternalFrames( filename, previousTraceError.stack );
@@ -51,17 +55,17 @@ function prepareStackTrace( error, structuredStackTrace ) {
  * @param {function} fn Callback function
  * @param {String} frameLocation Code point where this callback was called. Eg. "MyClass.method"
  */
-function wrapCallback( fn, frameLocation ) {
+function wrapCallback( fn, frameLocation, foo ) {
   const traceError = new Error();
   traceError.__location = frameLocation;
   traceError.__previous = currentTraceError;
 
-  return function ( ...args ) {
+  return function $wrappedCallback( ...args ) {
     currentTraceError = traceError;
     try {
       return fn.call( this, ...args );
     } catch ( e ) {
-      console.error( `FullStack Exception: Can't wrap given callback.\n    Function: ${fn}\n    Location: ${frameLocation}\n    Error: ${e}` );
+      throw e; // we just need the the 'finally'
     } finally {
       currentTraceError = null;
     }
@@ -76,29 +80,38 @@ module.exports = {
    * @function module:prepare
    * @param {Object} obj Method owner (eg.: global)
    * @param {String} prop Method name
-   * @param {...Number} cbIds Within this method parameters, which of those are callback functions (just the id - zero padded)
    */
-  prepare( obj, prop, ...cbs ) {
-
+  prepare( obj, prop/*, ...cbIds*/ ) {
     // load the prepareStackTrace for the first time (if needed)
-    if (!Error.prepareStackTrace) {
+    if ( !Error.prepareStackTrace ) {
       Error.prepareStackTrace = prepareStackTrace;
     }
 
-    if ( typeof obj[prop] !== 'function' ) {
-      console.error( `FullStack Exception: ${obj} don't have member function ${prop}.` );
-      return;
+    if ( obj === null || obj === undefined ) {
+      throw new Error( `[FullStack] Object can't be ${obj}.` );
     }
 
-    const sourcePosition = `${obj.constructor.name || Object.prototype.toString.call( obj )}.${prop}`;
-    const fn = obj[prop];
+    if ( !obj || typeof obj[prop] !== 'function' ) {
+      throw new Error( `[FullStack] "${utils.getObjectName( obj )}.${prop}" is not a function` );
+    }
 
-    obj[prop] = function ( ...args ) {
-      cbs.filter( cb => args[cb] ).forEach( cb => {
-        args[cb] = wrapCallback( args[cb], sourcePosition );
-      } );
+    const origin = utils.getMethodName( obj, prop );
+    const method = obj[prop];
 
-      return fn.call( this, ...args );
-    };
+    // return a wrapped version of given object method
+    function $wrapped( ...args ) {
+      const wrappedArgs = args.slice();
+
+      args.forEach( (arg, i) => {
+        if ( typeof arg === 'function') {
+          wrappedArgs[i] = wrapCallback( args[i], origin );
+        }
+      });
+
+      return method.call( this, ...wrappedArgs );
+    }
+
+    // insert that on the original object
+    ObjectHandler.stub( obj, prop, $wrapped );
   }
 };

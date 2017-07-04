@@ -1,7 +1,7 @@
 {
   "name": "full_stack",
-  "version": "0.0.2",
-  "description": "Dont lose logs on Node's event loop callbacks",
+  "version": "0.1.0",
+  "description": "Stop losing stack trace on Node event loop callbacks",
   "main": "full_stack.js",
   "dependencies": {},
   "devDependencies": {
@@ -21,9 +21,9 @@
     "url": "git@github.com:madeinstefano/full_stack.git"
   },
   "keywords": [
-    "logs",
-    "request",
-    "node"
+    "node",
+    "stacktrace",
+    "error"
   ],
   "engines": {
     "node": "8.1.2",

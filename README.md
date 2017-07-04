@@ -1,7 +1,13 @@
 # Full Stack
 
-Keep stack trace from objects after its callback is executed on another event on js event loop.
-Works nice with promise, setTimeouts nad eventemiter.
+Stop losing stack trace on Node event loop callbacks.
+
+This is implantation allows the user to set what event loop callbacks he wants to keep the trace.
+
+
+The algorithm was based on **long-stack-traces** (https://github.com/tlrobinson/long-stack-traces) - which I thank!
+
+That was somehow improved and have a nice test coverage.
 
 ### 1. Install & import
 
@@ -11,20 +17,22 @@ Works nice with promise, setTimeouts nad eventemiter.
 const Fullstack = require('full_stack');
 ```
 
-### 2. Set which type of async events you want to keep track
+### 2. Set which micro/macrotasks callbacks you want to keep the stack trace
 
 ```js
-Fullstack.prepare( Promise.prototype, 'then', 0, 1 );
+// Eg:
+Fullstack.prepare( Promise.prototype, 'then' );
+Fullstack.prepare( global, 'setInterval' );
+Fullstack.prepare( EventEmmiter.prototype, 'on' );
 ```
 
-The function prepare take two fixed arguments, and a rest argument:
+The function prepare take two argument:
 - **object** *{Object}*: The object that have the target function/method
-- **prop** *{String}*: The name of the func/method
-- **cbIndexes** *{...Number}*: Which parameters of the function are callbacks (zero padded indexes), so for the Promise.prototype.then, that takes two arguments: callbackOk and callbackError, your indexes are 0 and 1.
+- **prop** *{String}*: The name of the function/method
 
 ### 3. Enjoy
 
-Now every time you get the stacktrece inside callbacks of the *then* function, you will get the full stacktrace from before it was called as well:
+Now every time you get the stack trace inside callbacks of the prepared function, you will get the full **stack trace** from before it was called as well, eg.:
 
 ```bash
 Promise.then.ok at /home/stefano/repo/full_stack/spec/unit/full_stack_test.js:19:36
