@@ -34,8 +34,21 @@ The function prepare take two argument:
 
 Now every time you get the stack trace inside callbacks of the prepared function, you will get the full **stack trace** from before it was called as well, eg.:
 
+**BEFORE**
 ```bash
-Promise.then.ok at /home/stefano/repo/full_stack/spec/unit/full_stack_test.js:19:36
+Error
+    at Promise.then.x (/home/stefano/repo/full_stack/x.js:8:16)
+    at <anonymous>
+    at process._tickCallback (internal/process/next_tick.js:169:7)
+    at Function.Module.runMain (module.js:607:11)
+    at startup (bootstrap_node.js:158:16)
+    at bootstrap_node.js:575:3
+```
+
+**AFTER**
+```bash
+Error
+    at Promise.then.x (/home/stefano/repo/full_stack/x.js:8:16)
     at <anonymous>
     at process._tickCallback (internal/process/next_tick.js:169:7)
     at Function.Module.runMain (module.js:607:11)
@@ -44,8 +57,7 @@ Promise.then.ok at /home/stefano/repo/full_stack/spec/unit/full_stack_test.js:19
 ----------------------------------------
     at Promise.then
     at Array.forEach (native)
-    at superfunc (/home/stefano/repo/full_stack/spec/unit/full_stack_test.js:18:5)
-    at Object.<anonymous> (/home/stefano/repo/full_stack/spec/unit/full_stack_test.js:31:1)
+    at Object.<anonymous> (/home/stefano/repo/full_stack/x.js:7:4)
     at Module._compile (module.js:569:30)
     at Object.Module._extensions..js (module.js:580:10)
     at Module.load (module.js:503:32)
@@ -53,4 +65,5 @@ Promise.then.ok at /home/stefano/repo/full_stack/spec/unit/full_stack_test.js:19
     at Function.Module._load (module.js:458:3)
     at Function.Module.runMain (module.js:605:10)
     at startup (bootstrap_node.js:158:16)
+    at bootstrap_node.js:575:3
 ```
