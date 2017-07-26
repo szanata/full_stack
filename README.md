@@ -17,8 +17,22 @@ That was somehow improved and have a nice test coverage.
 const Fullstack = require('full_stack');
 ```
 
-### 2. Set which micro/macrotasks callbacks you want to keep the stack trace
+### 2. Setup most well know functions using  
+```js
+Fullstack.setDefaultTraps();
+```
 
+The default traps include  
+- Promise.catch
+- Promise.then
+- setTimeout
+- setInterval
+- setImmediate
+- process.nextTick
+- EventEmitter.on (includes http/https/request)
+- fs.readFile
+
+Or, optionally, setup which micro/macrotasks callbacks you want to keep the stack trace  
 ```js
 // Eg:
 Fullstack.prepare( Promise.prototype, 'then' );
@@ -26,7 +40,7 @@ Fullstack.prepare( global, 'setInterval' );
 Fullstack.prepare( EventEmmiter.prototype, 'on' );
 ```
 
-The function prepare take two argument:
+The function `prepare` take two argument:
 - **object** *{Object}*: The object that have the target function/method
 - **prop** *{String}*: The name of the function/method
 

@@ -1,6 +1,9 @@
 const chai = require('chai');
-const Fullstack = require('../../full_stack');
+const Fullstack = require('../../lib/full_stack');
 const events = require('events');
+const http = require('http');
+const request = require('request');
+const fs = require('fs');
 
 const expect = chai.expect;
 const assert = chai.assert;
@@ -22,7 +25,33 @@ describe('Fullstack test', function () {
     }
   });
 
-  it('Should have the stack from before the Promise.then', () => {
+  it('Should keep the stack from before the http.get', done => {
+    Fullstack.prepare( events.EventEmitter.prototype, 'on' );
+
+    http.get({ host: 'www.google.com', port: 80 }, response => {
+      const stack = new Error().stack;
+      assert( stack.includes( 'at EventEmitter.on' ) );
+      assert( stack.includes( '----------------------------------------' ) );
+      done();
+    }).on('error', e => {
+      done( e );
+    });
+  });
+
+  it('Should keep the stack from before the request.get', done => {
+    Fullstack.prepare( events.EventEmitter.prototype, 'on' );
+
+    request('www.google.com', (err, response) => {
+      const stack = new Error().stack;
+      assert( stack.includes( 'at EventEmitter.on' ) );
+      assert( stack.includes( '----------------------------------------' ) );
+      done();
+    }).on('error', e => {
+      done( e );
+    });
+  });
+
+  it('Should keep the stack from before the Promise.then', () => {
     Fullstack.prepare( Promise.prototype, 'then' );
 
     const promise = new Promise( resolve => resolve( 10 ) );
@@ -38,6 +67,34 @@ describe('Fullstack test', function () {
     });
   });
 
+  it('Should keep the stack from before a file IO (read)', done => {
+    Fullstack.prepare( fs, 'readFile' );
+
+    fs.readFile('README.md', (err, data) => {
+      if (err) throw err;
+      const stack = new Error().stack;
+      assert( stack.includes( 'at Object.readFile' ) );
+      assert( stack.includes( '----------------------------------------' ) );
+      done();
+    });
+  });
+
+  it('Should keep the stack from before EventEmitter.on', done => {
+    Fullstack.prepare( events.EventEmitter.prototype, 'on' );
+
+    const emitter = new events.EventEmitter();
+    let stack;
+    emitter.on('foo', function () {
+      stack = new Error().stack;
+      assert( stack.includes('EventEmitter.on') );
+      assert( stack.includes('EventEmitter.emit') );
+      assert( stack.includes( '----------------------------------------' ) );
+      done();
+    });
+
+    emitter.emit('foo');
+  });
+
   it('Should keep the first part of the stack trace intact', async () => {
     let originalTrace = '';
     let promise = new Promise( resolve => resolve( 10 ) );
@@ -51,12 +108,12 @@ describe('Fullstack test', function () {
     promise = new Promise( resolve => resolve( 20 ) );
 
     return promise.then( value => {
-      const stack = new Error().stack;
+      const stack = new Error().stack.replace(/:\d+:\d+\)/g,''); // remove line numbers
       expect( stack.indexOf( originalTrace ) ).to.eql( 0 ); // first position
     });
   });
 
-  it('Should keep multiple old stacks', done => {
+  it('Should keep multiple stack from various events loops', done => {
     Fullstack.prepare( Promise.prototype, 'then' );
     Fullstack.prepare( global, 'setImmediate' );
 
@@ -73,6 +130,7 @@ describe('Fullstack test', function () {
       });
     });
   });
+
 
   it('Should not mix different stack traces', done => {
     Fullstack.prepare( Promise.prototype, 'then' );
@@ -115,18 +173,4 @@ describe('Fullstack test', function () {
     }, 10 );
   });
 
-  it('Should get stack from EventEmitter', done => {
-    Fullstack.prepare( events.EventEmitter.prototype, 'on' );
-
-    const emitter = new events.EventEmitter();
-    let stack;
-    emitter.on('foo', function () {
-      stack = new Error().stack;
-      assert( stack.includes('EventEmitter.on') );
-      assert( stack.includes('EventEmitter.emit') );
-      done();
-    });
-
-    emitter.emit('foo');
-  });
 });
