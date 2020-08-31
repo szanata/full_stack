@@ -5,6 +5,7 @@ set -e
 printf "\n\e[34;1m[Testing node 14]\e[0m\n"
 
 docker run --rm -it \
+  -e NPM_TOKEN="empty" \
   -e NODE_ENV=development \
   -v `pwd`:/app/ \
   -w /app/ \
@@ -12,6 +13,7 @@ docker run --rm -it \
 
 printf "\n\e[34;1m[Testing node 12]\e[0m\n"
 docker run --rm -it \
+  -e NPM_TOKEN="empty" \
   -e NODE_ENV=development \
   -v `pwd`:/app/ \
   -w /app/ \
@@ -19,6 +21,7 @@ docker run --rm -it \
 
 printf "\n\e[34;1m[Testing node 10]\e[0m\n"
 docker run --rm -it \
+  -e NPM_TOKEN="empty" \
   -e NODE_ENV=development \
   -v `pwd`:/app/ \
   -w /app/ \
@@ -26,6 +29,7 @@ docker run --rm -it \
 
 printf "\n\e[34;1m[Testing node 8]\e[0m\n"
 docker run --rm -it \
+  -e NPM_TOKEN="empty" \
   -e NODE_ENV=development \
   -v `pwd`:/app/ \
   -w /app/ \
