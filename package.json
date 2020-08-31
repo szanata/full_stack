@@ -21,7 +21,9 @@
   "scripts": {
     "lint": "eslint ./",
     "lint:fix": "eslint ./ --fix",
-    "test": "jest --testPathIgnorePatterns trap_stack --env=node  ./ && node ./src/trap_stack.spec.js"
+    "test:traps": "node ./src/trap_stack.spec.js",
+    "test:unit": "jest --testPathIgnorePatterns trap_stack --env=node ./",
+    "test": "npm run test:traps && npm run test:unit"
   },
   "contributors": [
     {
