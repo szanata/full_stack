@@ -2,52 +2,6 @@
 
 Stop losing stack trace on Node event loop callbacks.
 
-This is implantation allows the user to set what event loop callbacks he wants to keep the trace.
-
-
-The algorithm was based on **long-stack-traces** (https://github.com/tlrobinson/long-stack-traces) - which I thank!
-
-That was somehow improved and have a nice test coverage.
-
-### 1. Install & import
-
-`npm install full_stack`
-
-```js
-const Fullstack = require('full_stack');
-```
-
-### 2. Setup most well know functions using  
-```js
-Fullstack.setDefaultTraps();
-```
-
-The default traps include  
-- Promise.catch
-- Promise.then
-- setTimeout
-- setInterval
-- setImmediate
-- process.nextTick
-- EventEmitter.on (includes http/https/request)
-- fs.readFile
-
-Or, optionally, setup which micro/macrotasks callbacks you want to keep the stack trace  
-```js
-// Eg:
-Fullstack.prepare( Promise.prototype, 'then' );
-Fullstack.prepare( global, 'setInterval' );
-Fullstack.prepare( EventEmmiter.prototype, 'on' );
-```
-
-The function `prepare` take two argument:
-- **object** *{Object}*: The object that have the target function/method
-- **prop** *{String}*: The name of the function/method
-
-### 3. Enjoy
-
-Now every time you get the stack trace inside callbacks of the prepared function, you will get the full **stack trace** from before it was called as well, eg.:
-
 **BEFORE**
 ```bash
 Error
@@ -81,3 +35,60 @@ Error
     at startup (bootstrap_node.js:158:16)
     at bootstrap_node.js:575:3
 ```
+
+This implantation allows all or some event loop callbacks to be intercepted and have its trace stored.
+
+The algorithm is based on **long-stack-traces** (https://github.com/tlrobinson/long-stack-traces) - which I thank!
+
+## 1. Install & import
+
+```bash
+npm install -S full_stack
+```
+
+```js
+const fullStack = require('full_stack');
+```
+
+## 2. Setup the traps
+
+```js
+fullStack.setDefaultTraps();
+```
+
+*You should do this right in the beginning of you code.*
+
+This will setup trap on most functions that create event loop tasks.
+
+The default list of traps are:
+- Promise.prototype.catch
+- Promise.prototype.then
+- setTimeout
+- setInterval
+- setImmediate
+- process.nextTick
+- EventEmitter.prototypeon (includes http/https/request)
+- fs.readFile
+- fs.writeFile
+
+But you can set your own trap:
+
+```js
+// Eg:
+fullStack.trap( Promise.prototype, 'then' );
+fullStack.trap( global, 'setInterval' );
+fullStack.trap( EventEmmiter.prototype, 'on' );
+```
+
+The function `trap` take two argument:
+- **object** *{Object}*: The object that have the target function/method
+- **prop** *{String}*: The name of the function/method
+
+## 3. Enjoy
+That's it.
+
+## Compatibility
+- Node 14.x
+- Node 12.x
+- Node 10.x
+- Node 8.x
