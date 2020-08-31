@@ -1,5 +1,7 @@
 # Full Stack
 
+[![Build Status](https://travis-ci.org/szanata/full_stack.svg?branch=master)](https://travis-ci.org/szanata/full_stack)
+
 Stop losing stack trace on Node event loop callbacks.
 
 **BEFORE**
