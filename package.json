@@ -1,21 +1,13 @@
 {
   "name": "full_stack",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Stop losing stack trace on Node event loop callbacks",
   "main": "main.js",
   "dependencies": {},
   "devDependencies": {
-    "chai": "3.5.0",
-    "eslint": "^3.19.0",
-    "eslint-config-airbnb": "^14.1.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^4.0.0",
-    "eslint-plugin-react": "^6.10.3",
-    "express": "^4.13.4",
-    "mocha": "3.0.1",
-    "mock-require": "1.3.0",
-    "sinon": "latest",
-    "request": "latest"
+    "eslint": "^7.7.0",
+    "jest": "^26.4.2",
+    "request": "^2.88.2"
   },
   "repository": {
     "type": "git",
@@ -26,20 +18,17 @@
     "stacktrace",
     "error"
   ],
-  "engines": {
-    "node": "8.1.2",
-    "npm": "3.10.6"
-  },
   "scripts": {
-    "lint:lib": "eslint lib/ --fix",
-    "lint:root": "eslint full_stack.js --fix",
-    "lint": "npm run lint:lib && npm run lint:root",
-    "test": "./node_modules/.bin/mocha --reporter spec --recursive ./spec/unit --timeout 5000"
+    "lint": "eslint ./",
+    "lint:fix": "eslint ./ --fix",
+    "test:traps": "node ./src/trap_stack.spec.js",
+    "test:unit": "jest --testPathIgnorePatterns trap_stack --env=node ./",
+    "test": "npm run test:traps && npm run test:unit"
   },
   "contributors": [
     {
       "name": "Stéfano Zanata",
-      "email": "contato@szanata.com"
+      "url": "https://github.com/szanata"
     }
   ]
 }
