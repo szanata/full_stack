@@ -2,7 +2,7 @@
   "name": "full_stack",
   "version": "1.0.0",
   "description": "Stop losing stack trace on Node event loop callbacks",
-  "main": "main.js",
+  "main": "src/index.js",
   "dependencies": {},
   "devDependencies": {
     "eslint": "^7.7.0",
