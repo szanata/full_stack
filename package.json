@@ -1,6 +1,6 @@
 {
   "name": "full_stack",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Stop losing stack trace on Node event loop callbacks",
   "main": "src/index.js",
   "dependencies": {},
